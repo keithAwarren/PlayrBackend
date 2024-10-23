@@ -1,57 +1,69 @@
 const express = require('express');
 const router = express.Router();
-
-let playlists = [];
+const { query } = require('../db/db');
 
 // Create a playlist (POST /api/playlists)
-router.post('/playlists', (req, res) => {
+router.post('/playlists', async (req, res) => {
   const { name, description } = req.body;
-  const newPlaylist = {
-    id: playlists.length + 1,
-    name,
-    description,
-    tracks: []
-  };
-  playlists.push(newPlaylist);
-  res.status(201).json(newPlaylist);
+  try {
+    const result = await query(
+      'INSERT INTO playlists (name, description, tracks) VALUES (?, ?, ?)',
+      [name, description, JSON.stringify([])]
+    );
+    res.status(201).json({ id: result.insertId, name, description, tracks: [] });
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating playlist', error });
+  }
 });
 
 // Get all playlists (GET /api/playlists)
-router.get('/playlists', (req, res) => {
-  res.json(playlists);
+router.get('/playlists', async (req, res) => {
+  try {
+    const playlists = await query('SELECT * FROM playlists');
+    res.json(playlists);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching playlists', error });
+  }
 });
 
 // Get a single playlist by ID (GET /api/playlists/:id)
-router.get('/playlists/:id', (req, res) => {
-  const playlist = playlists.find(p => p.id === parseInt(req.params.id));
-  if (playlist) {
-    res.json(playlist);
-  } else {
-    res.status(404).json({ message: 'Playlist not found' });
+router.get('/playlists/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [playlist] = await query('SELECT * FROM playlists WHERE id = ?', [id]);
+    if (playlist) {
+      res.json(playlist);
+    } else {
+      res.status(404).json({ message: 'Playlist not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching playlist', error });
   }
 });
 
 // Update a playlist by ID (PUT /api/playlists/:id)
-router.put('/playlists/:id', (req, res) => {
-  const playlist = playlists.find(p => p.id === parseInt(req.params.id));
-  if (playlist) {
-    const { name, description } = req.body;
-    playlist.name = name || playlist.name;
-    playlist.description = description || playlist.description;
-    res.json(playlist);
-  } else {
-    res.status(404).json({ message: 'Playlist not found' });
+router.put('/playlists/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, description } = req.body;
+  try {
+    await query(
+      'UPDATE playlists SET name = ?, description = ? WHERE id = ?',
+      [name, description, id]
+    );
+    res.json({ message: 'Playlist updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating playlist', error });
   }
 });
 
 // Delete a playlist by ID (DELETE /api/playlists/:id)
-router.delete('/playlists/:id', (req, res) => {
-  const playlistIndex = playlists.findIndex(p => p.id === parseInt(req.params.id));
-  if (playlistIndex !== -1) {
-    playlists.splice(playlistIndex, 1);
+router.delete('/playlists/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await query('DELETE FROM playlists WHERE id = ?', [id]);
     res.status(204).json({ message: 'Playlist deleted' });
-  } else {
-    res.status(404).json({ message: 'Playlist not found' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting playlist', error });
   }
 });
 

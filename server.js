@@ -1,12 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-dotenv.config();
+dotenv.config(); // Load environment variables
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Import routes and database connection
 const playlistRoutes = require('./routes/playlistRoutes');
+const { connectDB } = require('./db/db');
 
 // Middleware
 app.use(cors());
@@ -19,6 +21,9 @@ app.use('/api', playlistRoutes);
 app.get('/', (req, res) => {
   res.send('Spotify Backend is running!');
 });
+
+// Connect to the database
+connectDB();
 
 // Start the server
 app.listen(PORT, () => {

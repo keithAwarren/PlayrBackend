@@ -1,7 +1,20 @@
 const mysql = require('mysql2');
-const config = require('./config');
+const config = require('../config/config');
 
+// Create a MySQL connection pool
 const pool = mysql.createPool(config);
+
+// Function to establish a connection
+const connectDB = () => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error connecting to the database:', err.message);
+    } else {
+      console.log('Connected to the MySQL database');
+      connection.release(); // Release the connection back to the pool
+    }
+  });
+};
 
 // Helper function to run queries
 const query = (sql, params) => {
@@ -16,4 +29,4 @@ const query = (sql, params) => {
   });
 };
 
-module.exports = { query };
+module.exports = { connectDB, query };
