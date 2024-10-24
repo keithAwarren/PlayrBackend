@@ -3,8 +3,8 @@ const mysql = require('mysql2/promise');
 // Create a connection pool
 const pool = mysql.createPool({
     host: 'localhost',
-    user: 'your_username',
-    password: 'your_password',
+    user: 'root',
+    password: 'test-password',
     database: 'playr_backend',
     waitForConnections: true,
     connectionLimit: 10,
