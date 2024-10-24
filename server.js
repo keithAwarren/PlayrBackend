@@ -96,7 +96,27 @@ app.get('/api/spotify/playlists', async (req, res) => {
   }
 });
 
-// Use the playlist routes for other functionalities
+// Route to fetch song lyrics from Musixmatch
+app.get('/api/lyrics', async (req, res) => {
+  const { trackName, artistName } = req.query; // Get track and artist from query parameters
+
+  try {
+    const response = await axios.get('https://api.musixmatch.com/ws/1.1/matcher.lyrics.get', {
+      params: {
+        q_track: trackName,
+        q_artist: artistName,
+        apikey: process.env.MUSIXMATCH_API_KEY
+      }
+    });
+
+    const lyrics = response.data.message.body.lyrics.lyrics_body;
+    res.json({ lyrics });
+  } catch (error) {
+    console.error('Error fetching lyrics:', error);
+    res.status(500).send('Error fetching lyrics');
+  }
+});
+
 app.use('/api', playlistRoutes);
 
 // Basic route
