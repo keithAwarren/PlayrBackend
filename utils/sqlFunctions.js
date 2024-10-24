@@ -115,5 +115,6 @@ module.exports = {
     insertRecord,
     queryRecord,
     updateRecord,
-    deleteRecord
+    deleteRecord,
+    createTables
 };

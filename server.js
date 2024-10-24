@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 8080;
 // Import routes and database connection
 const playlistRoutes = require('./routes/playlistRoutes');
 const { connectDB } = require('./db/db');
+const { createTables } = require('./utils/sqlFunctions');
 
 // Determine the redirect URI based on the environment
 const redirectUri = process.env.NODE_ENV === 'production'
@@ -126,6 +127,7 @@ app.get('/', (req, res) => {
 
 // Connect to the database
 connectDB();
+createTables();
 
 // Start the server
 app.listen(PORT, () => {
