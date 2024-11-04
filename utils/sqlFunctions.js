@@ -104,6 +104,19 @@ const createTables = async () => {
             );
         `);
 
+        // Create favorites table
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS favorites (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id VARCHAR(255) NOT NULL,
+                item_type ENUM('track', 'playlist', 'lyrics') NOT NULL,
+                item_id VARCHAR(255) NOT NULL,
+                item_name VARCHAR(255),
+                item_artist VARCHAR(255),
+                FOREIGN KEY (user_id) REFERENCES users(spotify_id) ON DELETE CASCADE
+            );
+        `);
+
         connection.release();
         console.log('Tables created successfully.');
     } catch (error) {
