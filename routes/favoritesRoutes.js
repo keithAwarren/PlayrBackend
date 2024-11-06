@@ -5,6 +5,10 @@ const { insertRecord, queryRecord } = require('../utils/sqlFunctions');
 // Add a favorite item
 router.post('/favorites', async (req, res) => {
     const { userId, itemType, itemId, itemName, itemArtist } = req.body;
+    
+    // Log the parameters to check for undefined values
+    console.log("Favorite parameters:", { userId, itemType, itemId, itemName, itemArtist });
+
     try {
         await insertRecord(
             'favorites',
