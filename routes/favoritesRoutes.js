@@ -37,4 +37,19 @@ router.get('/favorites/:userId/:itemType', async (req, res) => {
     }
 });
 
+// Check if a track is a favorite
+router.get('/favorites/:userId/track/:trackId', async (req, res) => {
+    const { userId, trackId } = req.params;
+    try {
+        const [favorite] = await queryRecord(
+            'SELECT * FROM favorites WHERE user_id = ? AND item_id = ?',
+            [userId, trackId]
+        );
+        res.json({ isFavorite: !!favorite }); // Return true if the track is a favorite
+    } catch (error) {
+        console.error('Error checking favorite status:', error);
+        res.status(500).json({ message: 'Error checking favorite status' });
+    }
+});
+
 module.exports = router;
