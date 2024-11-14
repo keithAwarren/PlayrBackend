@@ -16,9 +16,10 @@ const insertRecord = async (table, fields, values) => {
     try {
         const connection = await pool.getConnection();
         const query = `INSERT INTO ${table} (${fields.join(', ')}) VALUES (${fields.map(() => '?').join(', ')})`;
-        await connection.execute(query, values);
+        const [result] = await connection.execute(query, values); // *Updated to capture result*
         connection.release();
         console.log('Record inserted successfully.');
+        return result; // *Return result to access insertId*
     } catch (error) {
         console.error('Error inserting record:', error);
     }
