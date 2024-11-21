@@ -21,7 +21,7 @@ app.use(express.json());
 
 // Routes
 app.use('/auth', authRoutes); // Auth routes for login, callback, etc.
-app.use('/api', userRoutes) // User Routes
+app.use('/auth', userRoutes) // User Routes
 app.use('/api', favoritesRoutes); // Favorites routes
 app.use('/api', playlistRoutes); // Playlist routes
 app.use('/api', lyricsRoutes); // Lyrics routes

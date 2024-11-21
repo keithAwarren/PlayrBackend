@@ -4,16 +4,20 @@ const { insertRecord, queryRecord } = require('../utils/sqlFunctions');
 
 // Add a favorite item
 router.post('/favorites', async (req, res) => {
-    const { userId, itemType, itemId, itemName, itemArtist } = req.body;
+    const { itemType, itemId, itemName, itemArtist } = req.body;
     
     // Log the parameters to check for undefined values
-    console.log("Favorite parameters:", { userId, itemType, itemId, itemName, itemArtist });
+    console.log("Favorite parameters:", { itemType, itemId, itemName, itemArtist });
+
+    if (!itemType || !itemId) {
+        return res.status(400).json({ message: 'Item type and item ID are required.' });
+    }
 
     try {
         await insertRecord(
             'favorites',
-            ['user_id', 'item_type', 'item_id', 'item_name', 'item_artist'],
-            [userId, itemType, itemId, itemName, itemArtist]
+            ['item_type', 'item_id', 'item_name', 'item_artist'],
+            [itemType, itemId, itemName, itemArtist]
         );
         res.status(201).json({ message: 'Favorite added successfully' });
     } catch (error) {
@@ -23,12 +27,12 @@ router.post('/favorites', async (req, res) => {
 });
 
 // Get favorite items by type
-router.get('/favorites/:userId/:itemType', async (req, res) => {
-    const { userId, itemType } = req.params;
+router.get('/favorites/:itemType', async (req, res) => {
+    const { itemType } = req.params;
     try {
         const favorites = await queryRecord(
-            'SELECT * FROM favorites WHERE user_id = ? AND item_type = ?',
-            [userId, itemType]
+            'SELECT * FROM favorites WHERE item_type = ?',
+            [itemType]
         );
         res.json(favorites);
     } catch (error) {
@@ -38,12 +42,12 @@ router.get('/favorites/:userId/:itemType', async (req, res) => {
 });
 
 // Check if a track is a favorite
-router.get('/favorites/:userId/track/:trackId', async (req, res) => {
-    const { userId, trackId } = req.params;
+router.get('/favorites/track/:trackId', async (req, res) => {
+    const { trackId } = req.params;
     try {
         const [favorite] = await queryRecord(
-            'SELECT * FROM favorites WHERE user_id = ? AND item_id = ?',
-            [userId, trackId]
+            'SELECT * FROM favorites WHERE item_id = ?',
+            [trackId]
         );
         res.json({ isFavorite: !!favorite }); // Return true if the track is a favorite
     } catch (error) {
