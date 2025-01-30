@@ -4,18 +4,18 @@ const axios = require("axios");
 const { insertRecord, queryRecord } = require("../utils/sqlFunctions");
 const router = express.Router();
 
-const redirectUri = "http://localhost:3000/MusicPlayr/callback";
+const redirectUri = "http://localhost:3000/MusicPlayr/callback"; // Frontend redirect after login
 
 router.get("/login", (req, res) => {
   const scope =
-    "user-read-private user-read-email playlist-read-private playlist-read-collaborative user-read-recently-played";
+    "user-read-private user-read-email playlist-read-private playlist-read-collaborative user-top-read user-read-recently-played";
   const params = querystring.stringify({
     client_id: process.env.SPOTIFY_CLIENT_ID,
     response_type: "code",
     redirect_uri: redirectUri,
     scope: scope,
   });
-  res.redirect(`https://accounts.spotify.com/authorize?${params}`);
+  res.redirect(`https://accounts.spotify.com/authorize?${params}`); // Redirect to spotify login
 });
 
 router.get("/callback", async (req, res) => {

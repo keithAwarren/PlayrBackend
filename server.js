@@ -12,7 +12,6 @@ const favoritesRoutes = require('./routes/favoritesRoutes');
 const authRoutes = require('./routes/authRoutes');
 const playlistRoutes = require('./routes/playlistRoutes');
 const lyricsRoutes = require('./routes/lyricsRoutes');
-const searchRoutes = require('./routes/searchRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes')
 const { connectDB } = require('./db/db');
 const { createTables } = require('./utils/sqlFunctions');
@@ -27,7 +26,6 @@ app.use('/auth', userRoutes) // User Routes
 app.use('/api', favoritesRoutes); // Favorites routes
 app.use('/api', playlistRoutes); // Playlist routes
 app.use('/api', lyricsRoutes); // Lyrics routes
-app.use('/api', searchRoutes); // Search routes
 app.use('/api/analytics', analyticsRoutes); // Analytics Routes
 
 // Basic route
