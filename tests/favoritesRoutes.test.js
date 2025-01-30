@@ -5,7 +5,7 @@ describe("Favorites API", () => {
   it("should add a track to favorites", async () => {
     const response = await request(app)
       .post("/api/favorites")
-      .set("Authorization", "Bearer BQBO1Iq-ze-ycix1zns-PZ26NgjWyOFqn4-n5Dr5rVFFuLCbKNbSNbx5owxcflBbFrkkPIMTvcWD5kL5Tg-ustyMoBFdwo0VOeF59wGFFXWNlRm1NFo36yqOwzzThwr76kghZHaenU3jQeuMrRxz3I51we-94_TObI97Qa2spOh92pP8Xyun4I9bcBxi0zXYWRLAGQzgbkmOntoY8e27z-Rpz8cv8vjCAWDds7W3bV69lNFX4cWm7T7zjiPI0qprQUcq8g")
+      .set("Authorization", "BQDGZpyd9o5ev8NBBiepoqsf3sw90imvcdN7D7GM4d7-aTbpbqFRrbT8BxfvznuRNb5masj_DZoiAhU6TJTW2iEWDIdkyY2-kC2CEMGALqzt9aDI_VxeFk6Ef4ixkaOTpy4htuW1Qh0RJV1R16apUqx783occSUpTm003XM68FfHVKrjgMBlN05AUKSQ67XpS4Es3qKJFai0ZtyNY1KaKA16wlZSkjENCQLlWzMJR2WvwJCSSnuG20Gyh7Rd52dl-6MMlw")
       .send({
         itemType: "track",
         itemId: "12345",
