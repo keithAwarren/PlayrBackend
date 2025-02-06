@@ -5,7 +5,10 @@ describe("Favorites API", () => {
   it("should add a track to favorites", async () => {
     const response = await request(app)
       .post("/api/favorites")
-      .set("Authorization", "BQDGZpyd9o5ev8NBBiepoqsf3sw90imvcdN7D7GM4d7-aTbpbqFRrbT8BxfvznuRNb5masj_DZoiAhU6TJTW2iEWDIdkyY2-kC2CEMGALqzt9aDI_VxeFk6Ef4ixkaOTpy4htuW1Qh0RJV1R16apUqx783occSUpTm003XM68FfHVKrjgMBlN05AUKSQ67XpS4Es3qKJFai0ZtyNY1KaKA16wlZSkjENCQLlWzMJR2WvwJCSSnuG20Gyh7Rd52dl-6MMlw")
+      .set(
+        "Authorization",
+        "BQAvSl8aqsQVtQksXRDI_OrBWEXH3pP_8UZ5_8CX1B0bU95P8yEQ99MNFc6oJtVmjnnJU0Q5bm0jN64l9OfIwOVv548Po6NozcydjN2F-aJJBlheeODkCK7ydWO87b1yGIMaVg3A_29KAPHuSip0qKutUE_o93qNLD7RSCCWp_dn_gAgWC8LdaGtF6686kDKqRiMJHeVlQ88Mwfk6JdsPxdeQ1EJg5JbHdxgW1xZ_DzaMdp0sg2BZKMAE-h9G991qTshnA"
+      )
       .send({
         itemType: "track",
         itemId: "12345",
@@ -15,5 +18,23 @@ describe("Favorites API", () => {
 
     expect(response.status).toBe(201);
     expect(response.body.message).toBe("Favorite added successfully");
+  });
+
+  it("should not add a track to favorites if itemType or itemId is missing", async () => {
+    const response = await request(app)
+      .post("/api/favorites")
+      .set(
+        "Authorization",
+        "BQAvSl8aqsQVtQksXRDI_OrBWEXH3pP_8UZ5_8CX1B0bU95P8yEQ99MNFc6oJtVmjnnJU0Q5bm0jN64l9OfIwOVv548Po6NozcydjN2F-aJJBlheeODkCK7ydWO87b1yGIMaVg3A_29KAPHuSip0qKutUE_o93qNLD7RSCCWp_dn_gAgWC8LdaGtF6686kDKqRiMJHeVlQ88Mwfk6JdsPxdeQ1EJg5JbHdxgW1xZ_DzaMdp0sg2BZKMAE-h9G991qTshnA"
+      )
+      .send({
+        // itemType is missing here
+        itemId: "67890",
+        itemName: "Invalid Song",
+        itemArtist: "Invalid Artist",
+      });
+
+    expect(response.status).toBe(400); // Expecting 400 Bad Request
+    expect(response.body.message).toBe("Item type and item ID are required.");
   });
 });
