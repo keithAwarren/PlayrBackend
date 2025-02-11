@@ -63,7 +63,7 @@ router.get("/top-artists", async (req, res) => {
     return res.status(401).json({ message: "Access token is required." });
   }
 
-  const { time_range = "medium_term", limit = 20 } = req.query; // Default time range and limit
+  const { time_range = "long_term", limit = 20 } = req.query; // Default time range and limit
 
   try {
     const response = await axios.get(
