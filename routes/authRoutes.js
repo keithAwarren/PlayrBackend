@@ -79,12 +79,17 @@ router.get("/callback", async (req, res) => {
       console.log(`New user created with ID: ${userId}`);
     }
 
+    const jwtPayload = { userId: userId, spotify_id, email };
+    const jwtToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
     // Redirect to frontend with access_token, refresh_token, and user_id
     console.log(
       `Redirecting to frontend with access_token, refresh_token, and user_id: ${userId}`
     );
     res.redirect(
-      `http://localhost:3000/MusicPlayr/dashboard#access_token=${access_token}&refresh_token=${refresh_token}&user_id=${userId}`
+      `http://localhost:3000/MusicPlayr/dashboard#access_token=${access_token}&refresh_token=${refresh_token}&jwt=${jwtToken}`
     );
   } catch (error) {
     console.error("Error during authentication:", error);
