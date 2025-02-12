@@ -3,6 +3,7 @@ const querystring = require("querystring");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const { insertRecord, queryRecord } = require("../utils/sqlFunctions");
+const { requiresAuth } = require("../middleware/authMiddleware")
 
 const router = express.Router();
 
@@ -118,7 +119,7 @@ router.get("/callback", async (req, res) => {
 });
 
 // Refreshes the Spotify access token using the refresh token.
-router.post("/refresh", async (req, res) => {
+router.post("/refresh", requiresAuth, async (req, res) => {
   const refreshToken = req.body.refresh_token;
 
   // Validate if refresh token is provided
