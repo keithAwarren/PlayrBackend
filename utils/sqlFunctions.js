@@ -20,9 +20,25 @@ const queryRecord = async (query, params = []) => {
     const [rows] = await connection.execute(query, params);
     connection.release();
     console.log("Query Result:", rows);
-    return rows;
+    return rows || [];
   } catch (error) {
     console.error("Error querying record:", error);
+    return [];
+  }
+};
+
+// Utility function to check if a record exists in a table
+const checkRecordExists = async (table, column, value) => {
+  try {
+    const connection = await pool.getConnection();
+    const query = `SELECT EXISTS(SELECT 1 FROM ${table} WHERE ${column} = ?) AS recordExists`;
+    const [result] = await connection.execute(query, [value]);
+    connection.release();
+    
+    console.log(`Record existence check result:`, result[0].recordExists);
+    return result[0].recordExists === 1;
+  } catch (error) {
+    console.error("Error checking record existence:", error);
   }
 };
 
@@ -137,6 +153,7 @@ const createTables = async () => {
 };
 
 module.exports = {
+  checkRecordExists,
   insertRecord,
   queryRecord,
   updateRecord,
