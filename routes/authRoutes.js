@@ -8,7 +8,7 @@ const { requiresAuth } = require("../middleware/authMiddleware")
 const router = express.Router();
 
 // URL to redirect back to your frontend after Spotify login
-const redirectUri = "http://localhost:3000/MusicPlayr/callback";
+const redirectUri = "https://musicplayr.onrender.com/MusicPlayr/callback";
 
 // Redirects the user to Spotify's authorization page for login.
 router.get("/login", (req, res) => {
@@ -106,14 +106,14 @@ router.get("/callback", async (req, res) => {
 
     // Redirect the user back to the frontend with access token, refresh token, and JWT
     res.redirect(
-      `http://localhost:3000/MusicPlayr/dashboard#access_token=${access_token}&refresh_token=${refresh_token}&jwt=${jwtToken}`
+      `https://musicplayr.onrender.com/MusicPlayr/dashboard#access_token=${access_token}&refresh_token=${refresh_token}&jwt=${jwtToken}`
     );
   } catch (error) {
     console.error("Error during authentication:", error);
 
     // If there's an error, redirect back to the login page with an error query parameter
     res.redirect(
-      `http://localhost:3000/MusicPlayr/login?error=authentication_error`
+      `https://musicplayr.onrender.com/MusicPlayr/login?error=authentication_error`
     );
   }
 });
