@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config(); // Load environment variables
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 8080;
 
 // Import routes and database connection
 const userRoutes = require("./routes/userRoutes");
