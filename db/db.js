@@ -16,6 +16,8 @@ const connectDB = () => {
   });
 };
 
+console.log("Database Config:", config);
+
 // Helper function to run queries
 const query = (sql, params) => {
   return new Promise((resolve, reject) => {
