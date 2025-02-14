@@ -8,7 +8,7 @@ const { requiresAuth } = require("../middleware/authMiddleware")
 const router = express.Router();
 
 // URL to redirect back to your frontend after Spotify login
-const redirectUri = "https://musicplayr.onrender.com/MusicPlayr/callback";
+const redirectUri = "https://musicplayr.onrender.com/callback";
 
 // Redirects the user to Spotify's authorization page for login.
 router.get("/login", (req, res) => {
