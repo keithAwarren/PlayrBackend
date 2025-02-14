@@ -160,4 +160,6 @@ router.post("/refresh", requiresAuth, async (req, res) => {
   }
 });
 
+console.log("Refresh token request received with token:", refreshToken);
+
 module.exports = router;
