@@ -113,8 +113,8 @@ router.get("/callback", async (req, res) => {
 
     // If there's an error, redirect back to the login page with an error query parameter
     res.redirect(
-      `https://keithawarren.github.io/MusicPlayr/login?error=authentication_error`
-    );
+      `https://keithawarren.github.io/MusicPlayr/#/dashboard?access_token=${access_token}&refresh_token=${refresh_token}&jwt=${jwtToken}`
+    );    
   }
 });
 
