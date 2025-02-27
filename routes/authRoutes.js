@@ -9,7 +9,7 @@ const router = express.Router();
 
 const redirectUri = "https://playrofficial.netlify.app/callback";
 
-// Redirects the user to Spotify's authorization page for login
+// Redirects user to Spotify's authorization page
 router.get("/login", (req, res) => {
   const scope =
     "user-read-private user-read-email playlist-read-private playlist-read-collaborative user-top-read user-read-recently-played";
@@ -24,12 +24,7 @@ router.get("/login", (req, res) => {
   res.redirect(`https://accounts.spotify.com/authorize?${params}`);
 });
 
-/**
- * Handles the callback from Spotify after login.
- * Exchanges the authorization code for tokens, retrieves user profile data, 
- * stores or updates the user in the database, generates a JWT, 
- * and redirects to the frontend with all tokens.
- */
+// Handles the callback from Spotify after login
 router.get("/callback", async (req, res) => {
   const code = req.query.code || null;
 
@@ -39,21 +34,23 @@ router.get("/callback", async (req, res) => {
   }
 
   try {
-    const data = querystring.stringify({
-      grant_type: "authorization_code",
-      code: code,
-      redirect_uri: redirectUri,
-      client_id: process.env.SPOTIFY_CLIENT_ID,
-      client_secret: process.env.SPOTIFY_CLIENT_SECRET,
-    });
+    // Use `Authorization` header instead of passing client_secret in the body
+    const tokenResponse = await axios.post(
+      "https://accounts.spotify.com/api/token",
+      querystring.stringify({
+        grant_type: "authorization_code",
+        code: code,
+        redirect_uri: redirectUri,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Basic ${Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString("base64")}`,
+        },
+      }
+    );
 
-    const response = await axios.post("https://accounts.spotify.com/api/token", data, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-
-    const { access_token, refresh_token } = response.data;
+    const { access_token, refresh_token } = tokenResponse.data;
 
     if (!access_token) {
       throw new Error("No access token received from Spotify.");
@@ -66,11 +63,7 @@ router.get("/callback", async (req, res) => {
 
     const { id: spotify_id, display_name, email, images } = userProfileResponse.data;
 
-    console.log("Spotify User Profile Data:", {
-      spotify_id,
-      display_name,
-      email,
-    });
+    console.log("Spotify User Profile Data:", { spotify_id, display_name, email });
 
     // Check if user exists in database
     const [existingUser] = await queryRecord(
@@ -97,13 +90,12 @@ router.get("/callback", async (req, res) => {
       expiresIn: "1h",
     });
 
-    // Redirect user to frontend with tokens in hash
+    //  Redirect user to frontend with tokens in hash
     res.redirect(
       `https://playrofficial.netlify.app/#access_token=${access_token}&refresh_token=${refresh_token}&jwt=${jwtToken}`
     );
   } catch (error) {
-    console.error("Error during authentication:", error);
-
+    console.error("Error during authentication:", error.response?.data || error.message);
     res.redirect("https://playrofficial.netlify.app/#/login?error=authentication_error");
   }
 });
@@ -117,29 +109,25 @@ router.post("/refresh", requiresAuth, async (req, res) => {
   }
 
   try {
-    const data = querystring.stringify({
-      grant_type: "refresh_token",
-      refresh_token: refreshToken,
-      client_id: process.env.SPOTIFY_CLIENT_ID,
-      client_secret: process.env.SPOTIFY_CLIENT_SECRET,
-    });
+    const refreshResponse = await axios.post(
+      "https://accounts.spotify.com/api/token",
+      querystring.stringify({
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Basic ${Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString("base64")}`,
+        },
+      }
+    );
 
-    const response = await axios.post("https://accounts.spotify.com/api/token", data, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-
-    const { access_token, expires_in } = response.data;
+    const { access_token, expires_in } = refreshResponse.data;
 
     res.json({ access_token, expires_in });
   } catch (error) {
-    console.error("Error refreshing token:", error);
-
-    if (error.response && error.response.status === 400) {
-      return res.status(400).json({ message: "Invalid refresh token." });
-    }
-
+    console.error("Error refreshing token:", error.response?.data || error.message);
     res.status(500).json({ message: "Failed to refresh token." });
   }
 });
