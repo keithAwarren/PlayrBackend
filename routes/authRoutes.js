@@ -61,7 +61,7 @@ router.get("/callback", async (req, res) => {
       headers: { Authorization: `Bearer ${access_token}` },
     });
 
-    const { id: spotify_id, display_name, email, images } = userProfileResponse.data;
+    const { id: spotify_id, display_name, email = null, images } = userProfileResponse.data;
 
     console.log("Spotify User Profile Data:", { spotify_id, display_name, email });
 
@@ -78,7 +78,7 @@ router.get("/callback", async (req, res) => {
       const result = await insertRecord(
         "users",
         ["spotify_id", "display_name", "email", "profile_image"],
-        [spotify_id, display_name, email, images[0]?.url || null]
+        [spotify_id, display_name, email || null, images[0]?.url || null]
       );
       userId = result.insertId;
       console.log(`New user created with ID: ${userId}`);
