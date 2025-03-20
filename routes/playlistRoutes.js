@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const { queryRecord, insertRecord, updateRecord, deleteRecord } = require('../utils/sqlFunctions');
+const { requiresAuth } = require('../middleware/authMiddleware')
 const router = express.Router();
 
 // Create a playlist locally and on Spotify
@@ -42,7 +43,7 @@ router.post('/playlists', async (req, res) => {
 });
 
 // Get all playlists (local + Spotify sync)
-router.get('/playlists', async (req, res) => {
+router.get('/playlists', requiresAuth, async (req, res) => {
   try {
     // Fetch playlists from the local database
     const playlists = await queryRecord('SELECT * FROM playlists');

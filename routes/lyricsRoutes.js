@@ -1,10 +1,11 @@
 const express = require('express');
 const axios = require('axios');
 const { queryRecord, insertRecord } = require('../utils/sqlFunctions');
+const { requiresAuth } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 // Route to fetch song lyrics from Musixmatch
-router.get('/lyrics', async (req, res) => {
+router.get('/lyrics', requiresAuth, async (req, res) => {
   const { trackName, artistName } = req.query; // Get track and artist from query parameters
 
   try {

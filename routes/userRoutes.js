@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { queryRecord, insertRecord } = require('../utils/sqlFunctions');
+const { requiresAuth } = require('../middleware/authMiddleware');
 
 // Create a new user
 router.post('/users', async (req, res) => {
@@ -27,7 +28,7 @@ router.get('/users', async (req, res) => {
 });
 
 // Get a single user by Spotify ID
-router.get('/users/:spotify_id', async (req, res) => {
+router.get('/users/:spotify_id', requiresAuth, async (req, res) => {
     const { spotify_id } = req.params;
     try {
         const user = await queryRecord('SELECT * FROM users WHERE spotify_id = ?', [spotify_id]);

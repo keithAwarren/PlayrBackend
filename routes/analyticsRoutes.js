@@ -1,9 +1,10 @@
 const express = require("express");
 const axios = require("axios");
+const { requiresAuth } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Fetch Recently Played Tracks
-router.get("/recently-played", async (req, res) => {
+router.get("/recently-played", requiresAuth, async (req, res) => {
   const accessToken = req.headers.authorization?.split(" ")[1];
   if (!accessToken) {
     return res.status(401).json({ message: "Access token is required." });
@@ -30,7 +31,7 @@ router.get("/recently-played", async (req, res) => {
 });
 
 // Fetch User's Top Tracks
-router.get("/top-tracks", async (req, res) => {
+router.get("/top-tracks", requiresAuth, async (req, res) => {
   const accessToken = req.headers.authorization?.split(" ")[1];
   if (!accessToken) {
     return res.status(401).json({ message: "Access token is required." });
@@ -57,7 +58,7 @@ router.get("/top-tracks", async (req, res) => {
 });
 
 // Fetch User's Top Artists
-router.get("/top-artists", async (req, res) => {
+router.get("/top-artists", requiresAuth, async (req, res) => {
   const accessToken = req.headers.authorization?.split(" ")[1];
   if (!accessToken) {
     return res.status(401).json({ message: "Access token is required." });

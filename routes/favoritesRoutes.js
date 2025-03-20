@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { insertRecord, queryRecord } = require('../utils/sqlFunctions');
+const { requiresAuth } = require('../middleware/authMiddleware');
 
 // Add a favorite item
 router.post('/favorites', async (req, res) => {
@@ -27,7 +28,7 @@ router.post('/favorites', async (req, res) => {
 });
 
 // Get favorite items by type
-router.get('/favorites/:itemType', async (req, res) => {
+router.get('/favorites/:itemType', requiresAuth, async (req, res) => {
     const { itemType } = req.params;
     try {
         const favorites = await queryRecord(
