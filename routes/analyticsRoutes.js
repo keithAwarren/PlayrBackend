@@ -1,12 +1,13 @@
 const express = require("express");
 const axios = require("axios");
+const { requiresAuth } = require("../middleware/authMiddleware")
 const router = express.Router();
 
 // Fetch Recently Played Tracks
-router.get("/recently-played", async (req, res) => {
-  const accessToken = req.headers.authorization?.split(" ")[1];
+router.get("/recently-played", requiresAuth, async (req, res) => {
+  const accessToken = req.user.spotify_access_token; // Use the token from req.user
   if (!accessToken) {
-    return res.status(401).json({ message: "Access token is required." });
+    return res.status(401).json({ message: "Access token is missing" });
   }
 
   try {
@@ -23,9 +24,12 @@ router.get("/recently-played", async (req, res) => {
       "Error fetching recently played tracks:",
       error.response?.data || error.message
     );
-    res
-      .status(500)
-      .json({ message: "Failed to fetch recently played tracks." });
+    
+    if (error.response?.status === 401) {
+      return res.status(401).json({ message: "Invalid or expired Spotify token" });
+    }
+    
+    res.status(500).json({ message: "Failed to fetch recently played tracks." });
   }
 });
 
