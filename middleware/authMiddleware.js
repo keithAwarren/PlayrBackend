@@ -18,7 +18,7 @@ const requiresAuth = async (req, res, next) => {
 
     // Fetch user's Spotify access token from the database
     const [user] = await queryRecord(
-      "SELECT spotify_id, spotify_access_token FROM users WHERE id = ?",
+      "SELECT spotify_id FROM users WHERE id = ?",
       [decoded.userId]
     );
 
@@ -29,7 +29,6 @@ const requiresAuth = async (req, res, next) => {
     req.user = {
       userId: decoded.userId,
       spotify_id: user.spotify_id,
-      spotify_access_token: user.spotify_access_token, // Attach Spotify token
     };
 
     next(); // Pass control to the next middleware
