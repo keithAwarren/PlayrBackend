@@ -1,10 +1,9 @@
 const express = require("express");
 const axios = require("axios");
-const { requiresAuth } = require("../middleware/authMiddleware")
 const router = express.Router();
 
 // Fetch Recently Played Tracks
-router.get("/recently-played", requiresAuth, async (req, res) => {
+router.get("/recently-played", async (req, res) => {
   const accessToken = req.user.spotify_access_token; // Use the token from req.user
   if (!accessToken) {
     return res.status(401).json({ message: "Access token is missing" });
