@@ -34,8 +34,8 @@ router.get("/recently-played", requiresAuth, async (req, res) => {
 });
 
 // Fetch User's Top Tracks
-router.get("/top-tracks", async (req, res) => {
-  const accessToken = req.headers.authorization?.split(" ")[1];
+router.get("/top-tracks", requiresAuth, async (req, res) => {
+  const accessToken = req.headers["spotify-access-token"];
   if (!accessToken) {
     return res.status(401).json({ message: "Access token is required." });
   }
@@ -61,8 +61,8 @@ router.get("/top-tracks", async (req, res) => {
 });
 
 // Fetch User's Top Artists
-router.get("/top-artists", async (req, res) => {
-  const accessToken = req.headers.authorization?.split(" ")[1];
+router.get("/top-artists", requiresAuth, async (req, res) => {
+  const accessToken = req.headers["spotify-access-token"];
   if (!accessToken) {
     return res.status(401).json({ message: "Access token is required." });
   }
