@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Fetch Recently Played Tracks
 router.get("/recently-played", requiresAuth, async (req, res) => {
-  const accessToken = req.headers.authorization?.split(" ")[1];
+  const accessToken = req.headers["spotify-access-token"];
   if (!accessToken) {
     return res.status(401).json({ message: "Access token is missing" });
   }
