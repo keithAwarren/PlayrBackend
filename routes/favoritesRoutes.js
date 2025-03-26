@@ -33,6 +33,39 @@ router.post("/favorites", requiresAuth, async (req, res) => {
   }
 });
 
+// Delete a favorite track
+router.delete("/favorites/track/:trackId", requiresAuth, async (req, res) => {
+  const { trackId } = req.params;
+  const { spotify_id } = req.user;
+
+  if (!trackId || !spotify_id) {
+    return res
+      .status(400)
+      .json({ message: "Track ID and user ID are required." });
+  }
+
+  try {
+    const result = await queryRecord(
+      "SELECT * FROM favorites WHERE user_id = ? AND item_id = ? AND item_type = 'track'",
+      [spotify_id, trackId]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Favorite not found." });
+    }
+
+    await queryRecord(
+      "DELETE FROM favorites WHERE user_id = ? AND item_id = ? AND item_type = 'track'",
+      [spotify_id, trackId]
+    );
+
+    res.json({ message: "Track removed from favorites." });
+  } catch (error) {
+    console.error("Error deleting favorite track:", error);
+    res.status(500).json({ message: "Failed to delete favorite." });
+  }
+});
+
 // Get favorite items by type for logged-in user
 router.get("/favorites/:itemType", requiresAuth, async (req, res) => {
   const { itemType } = req.params;
