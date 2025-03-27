@@ -1,5 +1,5 @@
-const mysql = require('mysql2');
-const config = require('../config/config');
+const mysql = require("mysql2");
+const config = require("../config/config");
 
 // Create a MySQL connection pool
 const pool = mysql.createPool(config);
@@ -8,9 +8,9 @@ const pool = mysql.createPool(config);
 const connectDB = () => {
   pool.getConnection((err, connection) => {
     if (err) {
-      console.error('Error connecting to the database:', err.message);
+      console.error("Error connecting to the database:", err.message);
     } else {
-      console.log('Connected to the MySQL database');
+      console.log("Connected to the MySQL database");
       connection.release(); // Release the connection back to the pool
     }
   });

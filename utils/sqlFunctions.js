@@ -35,7 +35,7 @@ const checkRecordExists = async (table, column, value) => {
     const query = `SELECT EXISTS(SELECT 1 FROM ${table} WHERE ${column} = ?) AS recordExists`;
     const [result] = await connection.execute(query, [value]);
     connection.release();
-    
+
     console.log(`Record existence check result:`, result[0].recordExists);
     return result[0].recordExists === 1;
   } catch (error) {

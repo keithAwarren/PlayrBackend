@@ -30,7 +30,9 @@ router.get("/callback", async (req, res) => {
 
   if (!code) {
     console.error("Missing authorization code");
-    return res.redirect("https://playrofficial.netlify.app/#/login?error=missing_code");
+    return res.redirect(
+      "https://playrofficial.netlify.app/#/login?error=missing_code"
+    );
   }
 
   try {
@@ -45,7 +47,9 @@ router.get("/callback", async (req, res) => {
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Basic ${Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString("base64")}`,
+          Authorization: `Basic ${Buffer.from(
+            `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+          ).toString("base64")}`,
         },
       }
     );
@@ -57,13 +61,25 @@ router.get("/callback", async (req, res) => {
     }
 
     // Fetch user's profile information using the access token
-    const userProfileResponse = await axios.get("https://api.spotify.com/v1/me", {
-      headers: { Authorization: `Bearer ${access_token}` },
+    const userProfileResponse = await axios.get(
+      "https://api.spotify.com/v1/me",
+      {
+        headers: { Authorization: `Bearer ${access_token}` },
+      }
+    );
+
+    const {
+      id: spotify_id,
+      display_name,
+      email = null,
+      images,
+    } = userProfileResponse.data;
+
+    console.log("Spotify User Profile Data:", {
+      spotify_id,
+      display_name,
+      email,
     });
-
-    const { id: spotify_id, display_name, email = null, images } = userProfileResponse.data;
-
-    console.log("Spotify User Profile Data:", { spotify_id, display_name, email });
 
     // Check if user exists in database
     const [existingUser] = await queryRecord(
@@ -95,8 +111,13 @@ router.get("/callback", async (req, res) => {
       `https://playrofficial.netlify.app/#access_token=${access_token}&refresh_token=${refresh_token}&jwt=${jwtToken}`
     );
   } catch (error) {
-    console.error("Error during authentication:", error.response?.data || error.message);
-    res.redirect("https://playrofficial.netlify.app/#/login?error=authentication_error");
+    console.error(
+      "Error during authentication:",
+      error.response?.data || error.message
+    );
+    res.redirect(
+      "https://playrofficial.netlify.app/#/login?error=authentication_error"
+    );
   }
 });
 
@@ -118,7 +139,9 @@ router.post("/refresh", requiresAuth, async (req, res) => {
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Basic ${Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString("base64")}`,
+          Authorization: `Basic ${Buffer.from(
+            `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+          ).toString("base64")}`,
         },
       }
     );
@@ -127,7 +150,10 @@ router.post("/refresh", requiresAuth, async (req, res) => {
 
     res.json({ access_token, expires_in });
   } catch (error) {
-    console.error("Error refreshing token:", error.response?.data || error.message);
+    console.error(
+      "Error refreshing token:",
+      error.response?.data || error.message
+    );
     res.status(500).json({ message: "Failed to refresh token." });
   }
 });

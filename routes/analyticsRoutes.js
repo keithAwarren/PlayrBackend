@@ -24,12 +24,16 @@ router.get("/recently-played", requiresAuth, async (req, res) => {
       "Error fetching recently played tracks:",
       error.response?.data || error.message
     );
-    
+
     if (error.response?.status === 401) {
-      return res.status(401).json({ message: "Invalid or expired Spotify token" });
+      return res
+        .status(401)
+        .json({ message: "Invalid or expired Spotify token" });
     }
-    
-    res.status(500).json({ message: "Failed to fetch recently played tracks." });
+
+    res
+      .status(500)
+      .json({ message: "Failed to fetch recently played tracks." });
   }
 });
 

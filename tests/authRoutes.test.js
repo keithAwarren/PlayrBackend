@@ -14,15 +14,16 @@ jest.mock("../utils/sqlFunctions", () => ({
 }));
 
 describe("Authentication API", () => {
-
   // Test: Redirect to Spotify's authorization page when hitting the login endpoint
   it("should redirect to Spotify's authorization page", async () => {
     const response = await request(app).get("/auth/login");
 
     // Expect a redirect (302 status code)
-    expect(response.status).toBe(302); 
+    expect(response.status).toBe(302);
     // Ensure the redirect URL is Spotify's authorization endpoint
-    expect(response.headers.location).toContain("https://accounts.spotify.com/authorize");
+    expect(response.headers.location).toContain(
+      "https://accounts.spotify.com/authorize"
+    );
   });
 
   // Test: Handle the callback when an invalid authorization code is provided
@@ -31,11 +32,16 @@ describe("Authentication API", () => {
     axios.post.mockRejectedValueOnce({
       response: {
         status: 400,
-        data: { error: "invalid_grant", error_description: "Invalid authorization code" },
+        data: {
+          error: "invalid_grant",
+          error_description: "Invalid authorization code",
+        },
       },
     });
 
-    const response = await request(app).get("/auth/callback?code=FAKE_AUTH_CODE");
+    const response = await request(app).get(
+      "/auth/callback?code=FAKE_AUTH_CODE"
+    );
 
     // Expect a redirect back to the login page with an error query
     expect(response.status).toBe(302);
@@ -48,13 +54,24 @@ describe("Authentication API", () => {
     axios.post.mockRejectedValueOnce({
       response: {
         status: 400,
-        data: { error: "invalid_grant", error_description: "Invalid refresh token" },
+        data: {
+          error: "invalid_grant",
+          error_description: "Invalid refresh token",
+        },
       },
     });
 
     // Generate a mock JWT token to simulate an authenticated user
-    const mockJwtPayload = { userId: 1, spotify_id: "mock_spotify_id", email: "mockuser@example.com" };
-    const validJwtToken = jwt.sign(mockJwtPayload, process.env.JWT_SECRET || 'test-secret', { expiresIn: "1h" });
+    const mockJwtPayload = {
+      userId: 1,
+      spotify_id: "mock_spotify_id",
+      email: "mockuser@example.com",
+    };
+    const validJwtToken = jwt.sign(
+      mockJwtPayload,
+      process.env.JWT_SECRET || "test-secret",
+      { expiresIn: "1h" }
+    );
 
     const response = await request(app)
       .post("/auth/refresh")
@@ -86,21 +103,33 @@ describe("Authentication API", () => {
       },
     });
 
-    const { queryRecord } = require("../utils/sqlFunctions")
-    queryRecord.mockResolvedValueOnce([{ id: 1, spotify_id: "mock_spotiy_id" }]);
+    const { queryRecord } = require("../utils/sqlFunctions");
+    queryRecord.mockResolvedValueOnce([
+      { id: 1, spotify_id: "mock_spotiy_id" },
+    ]);
 
-    const response = await request(app).get("/auth/callback?code=VALID_FAKE_CODE");
+    const response = await request(app).get(
+      "/auth/callback?code=VALID_FAKE_CODE"
+    );
 
     // Expect a redirect to the frontend with access_token, refresh_token, and JWT in the URL
     expect(response.status).toBe(302);
-    expect(response.headers.location).toMatch(/access_token=mock_access_token&refresh_token=mock_refresh_token&jwt=.*/);
+    expect(response.headers.location).toMatch(
+      /access_token=mock_access_token&refresh_token=mock_refresh_token&jwt=.*/
+    );
   });
 
   // Test: Successfully refresh the Spotify access token when a valid JWT and refresh token are provided
   it("should successfully refresh the access token with a valid JWT", async () => {
     // Generate a mock JWT token to simulate an authenticated user
-    const mockJwtPayload = { userId: 1, spotify_id: "mock_spotify_id", email: "mockuser@example.com" };
-    const validJwtToken = jwt.sign(mockJwtPayload, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const mockJwtPayload = {
+      userId: 1,
+      spotify_id: "mock_spotify_id",
+      email: "mockuser@example.com",
+    };
+    const validJwtToken = jwt.sign(mockJwtPayload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     // Mock Spotify's response for successfully refreshing the token
     axios.post.mockResolvedValueOnce({
@@ -113,7 +142,7 @@ describe("Authentication API", () => {
     // Make a POST request to the /auth/refresh endpoint with the JWT in the Authorization header
     const response = await request(app)
       .post("/auth/refresh")
-      .set("Authorization", `Bearer ${validJwtToken}`)  // Include JWT in header
+      .set("Authorization", `Bearer ${validJwtToken}`) // Include JWT in header
       .send({ refresh_token: "VALID_FAKE_REFRESH_TOKEN" });
 
     // Expect a 200 status and correct response data
@@ -138,7 +167,7 @@ describe("Authentication API", () => {
   it("should fail to refresh the access token with an invalid JWT", async () => {
     const response = await request(app)
       .post("/auth/refresh")
-      .set("Authorization", "Bearer INVALID_FAKE_JWT")  // Send an invalid JWT
+      .set("Authorization", "Bearer INVALID_FAKE_JWT") // Send an invalid JWT
       .send({ refresh_token: "VALID_FAKE_REFRESH_TOKEN" });
 
     expect(response.status).toBe(401);
